@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 esptool = "*"
+pyserial = "*"
 
 [dev-packages]
 py-make = "*"
