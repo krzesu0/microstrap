@@ -180,4 +180,4 @@ class Connection:
             # while the line doesnt start with >>>
             # keep appending data to destfile
             while b">>>" not in (data := self.readline()):
-                file.write(data.split(b'\r\n')[0])
+                file.write(data.split(b'\r\n')[0] + b'\r\n')
