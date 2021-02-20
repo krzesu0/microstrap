@@ -24,9 +24,8 @@ $ make hard_flash BAUD=115200 MICROPYTHON_IMAGE=esp8266-20210202-v1.14.bin
 ```
 
 ### Soft flash
-`soft_flash` is used to upload files from inside of `src/` directory to device's flash memory. By default all files are sent. Edit the `Makefile` to change it.
+`soft_flash` is used to upload files from inside of `src/` directory to device's flash memory. By default all files not mentioned in `.gitignore` are sent. Edit the `Makefile` to change it.
 
-Sometimes due to implementation it refuses to flash and throws `IOError`. Simply restart and it should finish succesfully.
 ```
 $ make soft_flash
 ...
@@ -41,8 +40,8 @@ Downloading file b'./boot.py'
 ```
 ## TODO's:
 - [ ] Check for file content changes instead of remove-and-reupload.
-- [ ] Add comments to code.
-- [ ] Fix random `IOError`'s.
+- [x] Add comments to code.
+- [x] Fix random `IOError`'s.
 
 
 # Prototyping using microstrap

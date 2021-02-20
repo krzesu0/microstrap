@@ -90,6 +90,7 @@ class Connection:
             self.write(REBOOT)
             self._past = False
             self.read(2)
+            sleep(0.1)
 
     def get_files(self) -> Tuple[List[str], List[str]]:
         "get files in main directory"
