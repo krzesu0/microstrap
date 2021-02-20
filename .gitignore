@@ -134,3 +134,11 @@ dest/*
 typings/*
 *.bin
 .vscode/
+
+# general for use with makefile
+*.md
+LICENSE
+Pipfile*
+requirements.txt
+.git/
+.gitignore

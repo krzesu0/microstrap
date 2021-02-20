@@ -1,4 +1,6 @@
-PY_FILES := $(shell find src/ -type f ! -name '.gitkeep')
+COMMAND = $(shell cat .gitignore | grep '^\w\|^\*\|^\.' | grep -v src | sed -r ':a;N;$$!ba;s/\n/\\\|/g' | tr -d '*')
+PY_FILES := $(shell find src/ -type f | grep -v "$(COMMAND)")
+#PY_FILES := $(shell find src/ -type f ! -name '.gitkeep')
 COM := /dev/ttyUSB0
 DEBUG := 0
 MICROPYTHON_IMAGE := esp8266-20210202-v1.14.bin
