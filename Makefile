@@ -10,7 +10,7 @@ init:
 	mkdir -pv dest typings src
 
 soft_flash:
-	python soft_flash.py $(DEBUG) $(COM) $(PY_FILES)
+	PYTHONUNBUFFERED=1 python soft_flash.py $(DEBUG) $(COM) $(PY_FILES)
 
 hard_flash:
 	python -m esptool --port $(COM) --baud $(BAUD) erase_flash

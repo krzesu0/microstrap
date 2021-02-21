@@ -39,9 +39,10 @@ Downloading file b'./boot.py'
 ...
 ```
 ## TODO's:
-- [ ] Check for file content changes instead of remove-and-reupload.
+- [x] Check for file content changes instead of remove-and-reupload.
 - [x] Add comments to code.
 - [x] Fix random `IOError`'s.
+- [ ] Add way of downloading binary files.
 
 
 # Prototyping using microstrap

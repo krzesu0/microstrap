@@ -1,6 +1,7 @@
 from serial import Serial
 from time import sleep
 from typing import List, Tuple
+from binascii import a2b_base64 as b64_decode
 
 from . import TREE_DIR, WRITE_FILE, CANCEL, REBOOT, RAW_MODE
 
@@ -79,7 +80,6 @@ class Connection:
                 data = self.read(1000)
                 if not b"\r\npaste mode" in data or data.startswith(b"==="):
                     print(data)
-                    # FIXME: Random IOErrors while trying to softflash
                     raise IOError("Couldnt start raw mode.")
         else:
             self.exit_paste_mode()
@@ -92,10 +92,11 @@ class Connection:
             self.read(2)
             sleep(0.1)
 
-    def get_files(self) -> Tuple[List[str], List[str]]:
+    def get_files(self) -> Tuple[List[str], List[str], List[str]]:
         "get files in main directory"
         files = []
         directories = []
+        file_hashes = []
         print("Downloading file listing.")
         # we use the small executables inside of ./executables/ to perform basic tasks
         # here we upload the small script to printout the flash contents
@@ -105,9 +106,15 @@ class Connection:
         # sort incoming data
         while b">>> " not in (item := self.readline()):
             if item.startswith(b"d "):
-                directories.append(item[2:].strip())
+                # d <dir name>
+                directories.append(item[2:].strip().decode("utf-8"))
             elif item.startswith(b"f "):
-                files.append(item[2:].strip())
+                # f <file name>
+                files.append(item[2:].strip().decode("utf-8"))
+            elif item.startswith(b"h "):
+                # h <b64 encoded data>
+                data = b64_decode(item[2:].strip().decode("utf-8"))
+                file_hashes.append(data)
             elif item == b"":
                 continue
             else:
@@ -117,8 +124,9 @@ class Connection:
         # remove the b'.' directory
         directories = [x for x in directories if x != b'.']
         if self.debug:
-            print(files, directories)
-        return files, directories
+            print(files, directories, file_hashes)
+        assert len(files) == len(file_hashes), "len(files) != len(file_hashes)"
+        return files, directories, file_hashes
 
     def remove_file(self, path: bytes, force: bool = True) -> None:
         "Remove remote file."
@@ -135,11 +143,8 @@ class Connection:
             sleep(0.2)
             # just to make sure it is succesfully deleted
 
-    def write_file(self, filename: str, dest_filename: bytes):
-        files = self.get_files()[0]
-        # TODO: implement something to check if the file was even changed
-        # and decide whether to remove it or keep it
-        if dest_filename in files:
+    def write_file(self, filename: str, dest_filename: bytes, remove: bool=True):
+        if remove:
             self.remove_file(dest_filename)
         
         self.prepare_paste_mode()
@@ -157,6 +162,7 @@ class Connection:
                 # bytes(str(data)) => b"""b'\x03\x14asd'"""
                 self.write_in_paste_mode(b"append('" + dest_filename + b"'," + bytes(str(data), "utf-8") + b")")
                 self.exit_paste_mode()
+                sleep(0.1)
                 print(".", end="")
         print("\nFile written!")
         self.prepare_paste_mode()

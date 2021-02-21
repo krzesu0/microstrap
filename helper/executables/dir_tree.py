@@ -1,4 +1,5 @@
-import os
+from binascii import b2a_base64 as b64_encode
+import os, uhashlib, gc
 
 files = []
 directories = set()
@@ -29,7 +30,18 @@ for item in directories:
     print("d ", end="")
     print(item)
 
+for item in files:
+    print("h ", end="")
+    with open(item, "rb") as file:
+        hash = uhashlib.sha1()
+        hash.update(file.read())
+    print(b64_encode(hash.digest()).decode("utf-8")[:-1])
+
 del files
 del directories
 del list_dir
 del generate
+del uhashlib
+del hash
+
+gc.collect()
